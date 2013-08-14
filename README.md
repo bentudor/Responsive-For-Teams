@@ -19,3 +19,13 @@ I use [CodeKit](https://incident57.com/codekit/) to compile, concatenate, and mi
 
 **To Add:**  
 * Bootstrap
+* 
+
+---
+
+**Licences:**  
+All licences belong to their respective authors:
+* [Gumby](https://github.com/GumbyFramework/Gumby/blob/master/README.md)
+* [Foundation](https://github.com/zurb/foundation/blob/master/LICENSE)
+
+All I did was pool it together. Use it at your own risk.
