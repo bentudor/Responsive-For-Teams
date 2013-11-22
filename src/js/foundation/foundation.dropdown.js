@@ -6,7 +6,7 @@
   Foundation.libs.dropdown = {
     name : 'dropdown',
 
-    version : '4.3.0',
+    version : '4.3.2',
 
     settings : {
       activeClass: 'open',
@@ -57,13 +57,15 @@
         .on('opened.fndtn.dropdown', '[data-dropdown-content]', this.settings.opened)
         .on('closed.fndtn.dropdown', '[data-dropdown-content]', this.settings.closed);
 
-      $(document).on('click.fndtn.dropdown', function (e) {
+      $(document).on('click.fndtn.dropdown touchstart.fndtn.dropdown', function (e) {
         var parent = $(e.target).closest('[data-dropdown-content]');
 
         if ($(e.target).data('dropdown') || $(e.target).parent().data('dropdown')) {
           return;
         }
-        if (parent.length > 0 && ($(e.target).is('[data-dropdown-content]') || $.contains(parent.first()[0], e.target))) {
+        if (!($(e.target).data('revealId')) && 
+          (parent.length > 0 && ($(e.target).is('[data-dropdown-content]') || 
+            $.contains(parent.first()[0], e.target)))) {
           e.stopPropagation();
           return;
         }
@@ -84,6 +86,8 @@
         if ($(this).hasClass(self.settings.activeClass)) {
           $(this)
             .css(Foundation.rtl ? 'right':'left', '-99999px')
+            .removeClass(self.settings.activeClass)
+            .prev('[data-dropdown]')
             .removeClass(self.settings.activeClass);
           $(this).trigger('closed');
         }
@@ -94,11 +98,16 @@
         this
           .css(dropdown
             .addClass(this.settings.activeClass), target);
+        dropdown.prev('[data-dropdown]').addClass(this.settings.activeClass);
         dropdown.trigger('opened');
     },
 
     toggle : function (target) {
       var dropdown = $('#' + target.data('dropdown'));
+      if (dropdown.length === 0) {
+        // No dropdown found, not continuing
+        return;
+      }
 
       this.close.call(this, $('[data-dropdown-content]').not(dropdown));
 
@@ -133,12 +142,12 @@
         dropdown.css({
           position : 'absolute',
           width: '95%',
-          left: '2.5%',
           'max-width': 'none',
           top: position.top + this.outerHeight(target)
         });
+        dropdown.css(Foundation.rtl ? 'right':'left', '2.5%');
       } else {
-        if (!Foundation.rtl && $(window).width() > this.outerWidth(dropdown) + target.offset().left) {
+        if (!Foundation.rtl && $(window).width() > this.outerWidth(dropdown) + target.offset().left && !this.data_options(target).align_right) {
           var left = position.left;
           if (dropdown.hasClass('right')) {
             dropdown.removeClass('right');

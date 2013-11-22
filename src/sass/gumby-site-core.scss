@@ -22,6 +22,7 @@
 
 @import "gumby/var/settings";
 @import "gumby/var/lists";
+@import "gumby/var/icons/entypo";
 
 @import "compass";
 @import "compass/reset";
@@ -32,4 +33,5 @@
 @import "gumby/fonts";
 @import "gumby/typography";
 @import "gumby/grid";
-//@import "gumby/ui/all";
+@import "gumby/ui/all";
+@import "gumby/shame";

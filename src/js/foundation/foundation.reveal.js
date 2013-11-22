@@ -89,13 +89,25 @@
             self.locked = true;
             self.close.call(self, bgClicked ? $('.reveal-modal.open') : $(this).closest('.reveal-modal'));
           }
-        })
-        .on('open.fndtn.reveal', '.reveal-modal', this.settings.open)
-        .on('opened.fndtn.reveal', '.reveal-modal', this.settings.opened)
-        .on('opened.fndtn.reveal', '.reveal-modal', this.open_video)
-        .on('close.fndtn.reveal', '.reveal-modal', this.settings.close)
-        .on('closed.fndtn.reveal', '.reveal-modal', this.settings.closed)
-        .on('closed.fndtn.reveal', '.reveal-modal', this.close_video);
+        });
+
+      if($(this.scope).hasClass('reveal-modal')) {
+        $(this.scope)
+          .on('open.fndtn.reveal', this.settings.open)
+          .on('opened.fndtn.reveal', this.settings.opened)
+          .on('opened.fndtn.reveal', this.open_video)
+          .on('close.fndtn.reveal', this.settings.close)
+          .on('closed.fndtn.reveal', this.settings.closed)
+          .on('closed.fndtn.reveal', this.close_video);
+      } else {
+        $(this.scope)
+          .on('open.fndtn.reveal', '.reveal-modal', this.settings.open)
+          .on('opened.fndtn.reveal', '.reveal-modal', this.settings.opened)
+          .on('opened.fndtn.reveal', '.reveal-modal', this.open_video)
+          .on('close.fndtn.reveal', '.reveal-modal', this.settings.close)
+          .on('closed.fndtn.reveal', '.reveal-modal', this.settings.closed)
+          .on('closed.fndtn.reveal', '.reveal-modal', this.close_video);
+      }
 
       $( 'body' ).bind( 'keyup.reveal', function ( event ) {
         var open_modal = $('.reveal-modal.open'),
@@ -132,7 +144,7 @@
         modal.trigger('open');
 
         if (open_modal.length < 1) {
-          this.toggle_bg(modal);
+          this.toggle_bg();
         }
 
         if (typeof ajax_settings === 'undefined' || !ajax_settings.url) {
@@ -169,7 +181,7 @@
       if (open_modals.length > 0) {
         this.locked = true;
         modal.trigger('close');
-        this.toggle_bg(modal);
+        this.toggle_bg();
         this.hide(open_modals, this.settings.css.close);
       }
     },
@@ -184,8 +196,8 @@
       return base;
     },
 
-    toggle_bg : function (modal) {
-      if ($('.reveal-modal-bg').length === 0) {
+    toggle_bg : function () {
+      if ($('.' + this.settings.bgClass).length === 0) {
         this.settings.bg = $('<div />', {'class': this.settings.bgClass})
           .appendTo('body');
       }
@@ -200,6 +212,16 @@
     show : function (el, css) {
       // is modal
       if (css) {
+        if (el.parent('body').length === 0) {
+          var placeholder = el.wrap('<div style="display: none;" />').parent();
+          el.on('closed.fndtn.reveal.wrapped', function() {
+            el.detach().appendTo(placeholder);
+            el.unwrap().unbind('closed.fndtn.reveal.wrapped');
+          });
+
+          el.detach().appendTo('body');
+        }
+
         if (/pop/i.test(this.settings.animation)) {
           css.top = $(window).scrollTop() - el.data('offset') + 'px';
           var end_css = {
